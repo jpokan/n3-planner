@@ -1,10 +1,10 @@
 <template>
-	<ul class="mx-5 mt-2 mb-5">
+	<ul class="mx-5 mt-2 mb-5 list-disc">
 		<li v-for="(item, index) in answers">
 			<SectionInput :model-value="item.text" @update:model-value="newValue => item.text = newValue" @remove="detach(index)" />
 		</li>
 		<li>
-			<SectionInput @keyup.enter="add" :model-value="init" @update:model-value="newValue => init = newValue" @build="buildJSON" />
+			<SectionInput init="true" @keyup.enter="add" :model-value="init" @update:model-value="newValue => init = newValue" @build="buildJSON" />
 		</li>
 	</ul>
 </template>
