@@ -1,5 +1,5 @@
 <template>
-<div class="font-satoshi p-10">
-	<TemplatesPlanYourDay />
+<div class="font-satoshi p-5 sm:p-10">
+	<Choose />
 </div>
 </template>

@@ -1,10 +1,12 @@
 <template>
 	<SectionTitle title="Plan Your Day" />
+	<p class="text-gray-500">{{ today }}</p>
 	<div class="my-10 border p-5 rounded-xl">
 		<div v-for="(item, index) in fields" :key="item.id">
 			<SectionH2 :title="item.title" />
 			<SectionQuestion :text="item.question" />
-			<SectionAnswer @payload="update($event, index)" :maxSize="item.maxSize" />
+			<SectionAnswer ref="answers" :answers="item.answers" :maxSize="item.maxSize"
+				@newAnswers="replace($event, index)" @update:DB="save" />
 		</div>
 	</div>
 </template>
@@ -12,60 +14,69 @@
 <script setup>
 import Dexie from 'dexie'
 const db = new Dexie('TEMPLATES')
-db.version(1).stores({ template_A: '&name' })
+db.version(1).stores({ PLAN_YOUR_DAY: '&name' })
+const today = ref(new Date().toDateString())
+const templateID = ref(today.value)
+const answers = ref(null)
+const cursor = ref({ target: 0, subindex: 0 })
 
-let fields = [
+const fields = ref([
 	{
 		id: 'brain-dump',
 		title: "BRAIN DUMP",
 		question: "What tasks are on your mind? Write everything!",
 		maxSize: null,
-		answers: []
+		answers: [{ text: '' }]
 	},
 	{
 		id: 'daily-highlights',
 		title: "DAILY HIGHLIGHTS",
 		question: "What are the top three priorities or task you want to accomplish today?",
 		maxSize: 3,
-		answers: []
+		answers: [{ text: '' }]
 	},
 	{
 		id: 'might-do-list',
 		title: "MIGHT-DO LIST",
 		question: "What else you might do today?",
 		maxSize: null,
-		answers: []
+		answers: [{ text: '' }]
 	},
 	{
 		id: 'todays-intention',
 		title: "TODAY'S INTENTION",
 		question: "What is your purpose for today? Keep it short and simple.",
 		maxSize: 1,
-		answers: []
+		answers: [{ text: '' }]
 	}
-]
+])
 
-onBeforeMount(() => checkLocalDB())
+onBeforeMount(() => getDataFromLocalDB())
 
-const checkLocalDB = () => {
-	db.template_A.get("plan_your_day")
-	.then((e) => fields = e.fields)
-}
-
-const update = (e, index) => {
-	// updates field object
-	fields[index].answers = e
-	save()
+const getDataFromLocalDB = () => {
+	db.PLAN_YOUR_DAY.get(templateID.value)
+		.then((e) => {
+			if (!e) return
+			fields.value = e.fields
+		})
 }
 
 const save = async () => {
-	db.template_A.put({ name: 'plan_your_day', fields })
-	.then(()=>console.log('success'))
-	.catch(()=>console.log('error'))
+	db.PLAN_YOUR_DAY.put({ name: templateID.value, fields: toRaw(fields.value) })
+		.then(() => console.log('SAVE::PUT success'))
+		.catch(() => console.log('SAVE::PUT error'))
 }
 
-const saveToLocalStorage = () => {
-	localStorage.setItem('template', JSON.stringify(fields))
+const replace = (e, index) => {
+	fields.value[index].answers = e.newArray
+	// Set cursor values
+	cursor.value.target = index
+	cursor.value.subindex = e.index + 1
 }
 
+const focus = () => {
+	answers.value[cursor.value.target].sectionInput[cursor.value.subindex].focus()
+}
+
+onUpdated(() => focus())
 </script>

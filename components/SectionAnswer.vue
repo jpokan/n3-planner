@@ -1,47 +1,51 @@
 <template>
 	<ul class="mx-5 mt-2 mb-5 list-disc">
 		<li v-for="(item, index) in answers">
-			<SectionInput :model-value="item.text"
+			<SectionInput :model-value="item.text" ref="sectionInput"
+			@keyup.enter="add(index)"
 			@update:model-value="newValue => item.text = newValue"
 			@remove="detach(index)"
-			@build="buildJSON" />
-		</li>
-		<li>
-			<SectionInput init="true"
-			@keyup.enter="add" :model-value="init"
-			@update:model-value="newValue => init = newValue"
-			@build="buildJSON" />
+			@updated="updateDB" />
 		</li>
 	</ul>
 </template>
 
 <script setup>
-let temp
-const props = defineProps(['maxSize'])
-const emit = defineEmits(['payload'])
-const init = ref('')
-const answers = ref([])
+const props = defineProps(['maxSize', 'answers'])
+const emit = defineEmits(['update:DB','newAnswers'])
+const sectionInput = ref(null)
 
-const add = (e) => {
-	// if list length equals maxSize return stop creating entry
-	if (answers.value.length == props.maxSize - 1) return
-	// add entry to answers
-	answers.value.push({ text: e.target.value })
-	// Clear input
-	init.value = ''
-	// Prepare data
-	buildJSON()
+const add = (index) => {
+	// if list length equals maxSize stop creating entry
+	if (props.answers.length === props.maxSize) return
+	// else, add entry to answers (rebuild answers array)
+	const newAnswersArray = makeAnswersArray(props.answers, index)
+	emit('newAnswers', newAnswersArray)
+	updateDB()
 }
 
 const detach = (index) => {
+	const length = toRaw(props.answers.length)
+	if (length <=1) {
+		props.answers[index].text = ''
+		updateDB()
+		return
+	}
 	// `arr.splice(n, 1)` n = index you want to remove
-	answers.value.splice(index, 1)
-	buildJSON()
+	props.answers.splice(index, 1)
+	updateDB()
 }
 
-const buildJSON = () => {
-	temp = [...toRaw(answers.value), { init: init.value }]
-	emit('payload', temp)
+const updateDB = () => {
+	emit('update:DB')
 }
 
+const makeAnswersArray = (answers, index) => {
+	const entry = { text: '' }
+	const oldArray = toRaw(answers)
+	const newArray = [...oldArray.slice(0, index + 1), entry, ...oldArray.slice(index + 1)]
+	return { newArray, index }
+}
+
+defineExpose({sectionInput})
 </script>
