@@ -19,8 +19,7 @@ const currentDay = ref(new Date().toDateString())
 const templateID = ref(currentDay.value)
 const answers = ref(null)
 const cursor = ref({ target: 0, subindex: 0 })
-
-const fields = ref([
+const definition = [
 	{
 		id: 'brain-dump',
 		title: "BRAIN DUMP",
@@ -33,7 +32,7 @@ const fields = ref([
 		title: "DAILY HIGHLIGHTS",
 		question: "What are the top three priorities or task you want to accomplish today?",
 		maxSize: 3,
-		answers: [{ text: '' }]
+		answers: [{ text: '' }, { text: '' }, { text: '' }]
 	},
 	{
 		id: 'might-do-list',
@@ -49,7 +48,9 @@ const fields = ref([
 		maxSize: 1,
 		answers: [{ text: '' }]
 	}
-])
+]
+
+const fields = ref([...definition])
 
 onBeforeMount(() => getDataFromLocalDB())
 
@@ -68,9 +69,7 @@ const getDataFromLocalDB = () => {
 }
 
 const reset = () => {
-	for(let i=0; i<fields.value.length; i++) {
-		fields.value[i].answers = [{text: ''}]
-	}
+	fields.value = definition
 }
 
 const save = async () => {
