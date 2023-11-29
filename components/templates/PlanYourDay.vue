@@ -1,6 +1,6 @@
 <template>
 	<SectionTitle title="Plan Your Day" />
-	<p class="text-gray-500">{{ today }}</p>
+	<Date @getDataFromLocalDB="getDataFromLocalDB" @updateDate="setDate($event)" :currentDay="currentDay" />
 	<div class="my-10 border p-5 rounded-xl">
 		<div v-for="(item, index) in fields" :key="item.id">
 			<SectionH2 :title="item.title" />
@@ -15,8 +15,8 @@
 import Dexie from 'dexie'
 const db = new Dexie('TEMPLATES')
 db.version(1).stores({ PLAN_YOUR_DAY: '&name' })
-const today = ref(new Date().toDateString())
-const templateID = ref(today.value)
+const currentDay = ref(new Date().toDateString())
+const templateID = ref(currentDay.value)
 const answers = ref(null)
 const cursor = ref({ target: 0, subindex: 0 })
 
@@ -55,10 +55,22 @@ onBeforeMount(() => getDataFromLocalDB())
 
 const getDataFromLocalDB = () => {
 	db.PLAN_YOUR_DAY.get(templateID.value)
-		.then((e) => {
-			if (!e) return
-			fields.value = e.fields
-		})
+	.then((e) => {
+		if (!e) {
+			// Create new empty entry
+			reset()
+			save()
+			return
+		}
+		// Set entry values
+		fields.value = e.fields
+	})
+}
+
+const reset = () => {
+	for(let i=0; i<fields.value.length; i++) {
+		fields.value[i].answers = [{text: ''}]
+	}
 }
 
 const save = async () => {
@@ -72,6 +84,11 @@ const replace = (e, index) => {
 	// Set cursor values
 	cursor.value.target = index
 	cursor.value.subindex = e.index + 1
+}
+
+const setDate = (e) => {
+	currentDay.value = e
+	templateID.value = e
 }
 
 const focus = () => {
