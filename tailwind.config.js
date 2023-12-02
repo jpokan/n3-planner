@@ -8,7 +8,7 @@ module.exports = {
 			},
 		},
 	},
-	safelist: ['list-disc','list-decimal']
+	safelist: ['list-disc','list-decimal'],
 	plugins: [
 		// ...
 	],
