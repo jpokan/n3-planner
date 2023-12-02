@@ -1,5 +1,9 @@
 <template>
-	<p><Left @goto="prevDay" />{{ today }}<Right @goto="nextDay" /></p>
+	<div>
+		<Left @goto="prevDay" />
+		<div class="inline-block w-44 px-5 text-center">{{ today }}</div>
+		<Right @goto="nextDay" />
+	</div>
 </template>
 
 <script setup>

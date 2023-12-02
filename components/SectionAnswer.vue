@@ -1,5 +1,5 @@
 <template>
-	<ul class="mx-5 mt-2 mb-5" :class="type">
+	<ul :class="type === 'list-decimal' ? 'list-decimal':'list-disc'" class="mx-5 mt-2 mb-5">
 		<li v-for="(item, index) in answers">
 			<SectionInput :model-value="item.text" ref="sectionInput"
 			@keyup.enter="add(index)"
