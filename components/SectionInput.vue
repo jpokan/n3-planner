@@ -1,6 +1,6 @@
 <template>
 <div class="flex group hover:bg-yellow-50 focus-within:bg-gray-100">
-	<input type="text" :value="modelValue" ref="input"
+	<input type="text" :value="modelValue" ref="input" name="answer-field"
 		class="focus:border-b border-b px-1 outline-none bg-transparent w-full"
 		@input="update">
 	<button v-if="!init" @click="remove"
@@ -26,6 +26,6 @@ const remove = () => {
 
 const focus = () => input.value.focus()
 
-defineExpose({focus})
+defineExpose({focus, input})
 
 </script>
