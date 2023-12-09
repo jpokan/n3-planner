@@ -1,5 +1,7 @@
 # Nuxt 3 Minimal Starter
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/d63795c4-f246-4ddd-b3e9-d579b4b8d787/deploy-status)](https://app.netlify.com/sites/n3-planner/deploys)
+
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
